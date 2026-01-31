@@ -1,0 +1,7 @@
+{
+    "name": "Inmobiliaria Connect - Córdoba Real Estate",
+    "description": "Una plataforma inmobiliaria moderna con integración de datos IDECOR, gestión de leads y visualización de mapas avanzada para la provincia de Córdoba.",
+    "requestFramePermissions": [
+        "geolocation"
+    ]
+}
