@@ -36,6 +36,17 @@ export interface Property {
     idecor: IdecorData;
 }
 
+export const LeadStatus = {
+    NEW: 'Nuevo',
+    CONTACTED: 'Contactado',
+    VISIT: 'Visita Programada',
+    NEGOTIATION: 'En Negociación',
+    WON: 'Cerrado Ganado',
+    LOST: 'Cerrado Perdido'
+} as const;
+
+export type LeadStatus = typeof LeadStatus[keyof typeof LeadStatus];
+
 export interface Lead {
     id: string;
     name: string;
@@ -44,60 +55,11 @@ export interface Lead {
     message: string;
     propertyId: string;
     timestamp: string;
-    status: 'New' | 'Contacted' | 'Closed';
+    status: LeadStatus;
+    notes?: string;
+    priority?: 'Baja' | 'Media' | 'Alta';
 }
 
 
-// export const PropertyType = {
-//     HOUSE: 'Casas',
-//     APARTMENT: 'Departamentos',
-//     LOT: 'Lotes',
-//     OFFICE: 'Oficinas'
-// } as const;
 
-// export type PropertyType = typeof PropertyType[keyof typeof PropertyType];
 
-// export const TransactionType = {
-//     BUY: 'Compra',
-//     RENT: 'Alquiler'
-// } as const;
-
-// export type TransactionType = typeof TransactionType[keyof typeof TransactionType];
-
-// export interface IdecorData {
-//     nomenclatura: string;
-//     valorFiscal: number;
-//     tipoSuelo: string;
-//     superficieM2: number;
-// }
-
-// export interface Property {
-//     id: string;
-//     title: string;
-//     price: number;
-//     type: PropertyType;
-//     transaction: TransactionType;
-//     location: [number, number]; // [lat, lng]
-//     address: string;
-//     description: string;
-//     images: string[];
-//     features: string[];
-//     idecor: IdecorData;
-// }
-
-// export interface Lead {
-//     id: string;
-//     name: string;
-//     email: string;
-//     phone: string;
-//     message: string;
-//     propertyId: string;
-//     timestamp: string;
-//     status: 'New' | 'Contacted' | 'Closed';
-// }
-
-// export interface AnalyticsData {
-//     pageViews: number;
-//     leadsGenerated: number;
-//     topProperty: string;
-// }

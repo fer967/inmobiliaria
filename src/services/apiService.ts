@@ -1,103 +1,77 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+import { LeadStatus } from '../types';
+
+let mockLeads: any[] = [
+    {
+        id: 'lead_1',
+        name: 'Ana García',
+        email: 'ana.garcia@gmail.com',
+        phone: '3515551234',
+        property_id: '1',
+        message: 'Interesada en la casa del Cerro. ¿Sigue disponible?',
+        status: LeadStatus.NEW,
+        timestamp: new Date().toISOString()
+    }
+];
 
 export const trackEvent = (eventName: string, params: object = {}) => {
     if (typeof (window as any).gtag === 'function') {
         (window as any).gtag('event', eventName, params);
     }
+    console.log(`[Analytics] ${eventName}:`, params);
 };
 
 export const fetchLeads = async () => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/leads`);
-        if (!response.ok) throw new Error('Error al obtener leads');
-        return await response.json();
-    } catch (error) {
-        console.error(error);
-        return [];
-    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return [...mockLeads];
 };
 
 export const updateLeadStatus = async (email: string, status: string) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/leads/${email}?status=${status}`, {
-            method: 'PATCH'
-        });
-        return response.ok;
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
+    mockLeads = mockLeads.map(l => l.email === email ? { ...l, status } : l);
+    return true;
 };
 
 export const fetchStats = async () => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/stats`);
-        return await response.json();
-    } catch (error) {
-        return { visitas_hoy: 0, leads_totales: 0, leads_nuevos: 0 };
-    }
+    return {
+        visitas_hoy: 1420,
+        leads_totales: mockLeads.length,
+        leads_nuevos: mockLeads.filter(l => l.status === LeadStatus.NEW).length,
+        api_status: "online"
+    };
 };
 
 export const fetchIdecorData = async (nomenclatura: string) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/idecor/${nomenclatura}`);
-        return await response.json();
-    } catch (error) {
-        return null;
-    }
+    await new Promise(resolve => setTimeout(resolve, 800));
+    return {
+        nomenclatura: nomenclatura,
+        valorFiscal: 18500000,
+        tipoSuelo: 'Residencial Baja Densidad (IDECOR)',
+        superficieM2: 850,
+        verificado: true,
+        fuente: 'Sincronizado con Catastro Córdoba (Mock)'
+    };
 };
 
 export const submitLeadToCRM = async (leadData: any) => {
     trackEvent('generar_lead', { property_id: leadData.propertyId });
-    try {
-        const response = await fetch(`${API_BASE_URL}/leads`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(leadData)
-        });
-        return response.ok;
-    } catch (error) {
-        return true; // Fallback para dev
-    }
+
+    const newLead = {
+        ...leadData,
+        id: `lead_${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: new Date().toISOString(),
+        status: leadData.status || LeadStatus.NEW
+    };
+
+    mockLeads = [newLead, ...mockLeads];
+    return true;
+};
+
+export const sendValuationEmail = async (email: string, body: string) => {
+    console.log(`[Email Service] Enviando informe a: ${email}`);
+    console.log(`[Email Content]:\n${body}`);
+    // Simulamos delay de servicio de mail (SendGrid/Mailgun)
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    return true;
 };
 
 
-// Este servicio centralizará las llamadas al backend de Python
-// const API_BASE_URL = 'http://localhost:8000/api'; // URL de tu futuro servidor FastAPI
 
-// export const trackEvent = (eventName: string, params: object = {}) => {
-//     // Fix: Cast window to any to access the global gtag function provided by Google Analytics script
-//     if (typeof (window as any).gtag === 'function') {
-//         (window as any).gtag('event', eventName, params);
-//     }
-//     console.log(`[GA4 Event]: ${eventName}`, params);
-// };
-
-// export const fetchIdecorData = async (nomenclatura: string) => {
-//     try {
-//         // En producción, esto llamaría a tu backend Python que hace el proxy a IDECOR
-//         const response = await fetch(`${API_BASE_URL}/idecor/${nomenclatura}`);
-//         if (!response.ok) throw new Error('Error al consultar IDECOR');
-//         return await response.json();
-//     } catch (error) {
-//         console.warn("Simulando datos IDECOR por falta de backend activo.");
-//         return null;
-//     }
-// };
-
-// export const submitLeadToCRM = async (leadData: any) => {
-//     trackEvent('generar_lead', { property_id: leadData.propertyId });
-
-//     try {
-//         const response = await fetch(`${API_BASE_URL}/leads`, {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify(leadData)
-//         });
-//         return response.ok;
-//     } catch (error) {
-//         console.error("Error enviando al CRM:", error);
-//         // Simulación para que la UI funcione sin el server prendido
-//         return true;
-//     }
-// };
